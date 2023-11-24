@@ -11,8 +11,6 @@ def index(request):
         if form.is_valid():
             url = form.cleaned_data['url']
             only_audio = form.cleaned_data['is_audio']
-            print(only_audio)
-            #TODO: download the video
             download_playlist(url, "./tmp",only_audio=form.cleaned_data['is_audio'])
     else:
         form = UrlForm()
