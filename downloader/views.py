@@ -3,7 +3,6 @@ from django.template import loader
 from django.shortcuts import render
 from .forms import UrlForm,DetailsForm
 from pytube import Playlist, YouTube
-import time
 
 def index(request):
     form = UrlForm()
@@ -15,9 +14,11 @@ def details(request):
     if request.method == 'GET':
         url = request.GET.get('url')
         request.session["url"] = url
-    
+        
         if 'playlist' not in url:
             thumb = YouTube(url).thumbnail_url
+        elif 'playlist' in url:
+            thumb = Playlist(url).videos[0].thumbnail_url
     
     if request.method == 'POST':
         form = DetailsForm(request.POST)

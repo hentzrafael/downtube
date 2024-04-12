@@ -2,11 +2,13 @@
 
 {% block content %}
 <div class="col-md-12 col-lg-12">
-    <img src="{{ thumb }}" alt="Youtube thumbnail">
+    <img src="{{ thumb }}" alt="Youtube thumbnail" class="img-fluid">
+    <fieldset class="form-fieldset">
     <form action="/download" method="post">
         {% csrf_token %}
         {{ form }}
-        <button type="submit button" class="btn btn-primary btn-lg">Baixar arquivo(s)</button>
+        <button type="submit button" class="btn btn-primary btn-lg">Download files</button>
     </form>
+</fieldset>
 </div>
 {% endblock %}

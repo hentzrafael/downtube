@@ -2,11 +2,18 @@
 
 {% block content %}
 <div class="col-md-12 col-lg-12">
+    <h2>Welcome to Downtube!</h2>
+    <p>This project allows you to easily download videos and playlists from YouTube.</p>
+    <p>We do not allow/support the download of copyrighted content. This project has the sole purpose of showing the use of Django to develop Python Web Applications.</p>
+    <fieldset class="form-fieldset">
     <form action="/download" method="get">
         {% csrf_token %}
+
+        <label class="form-label">Youtube URL</label>
         {{ form }}
 
-        <button type="submit button" class="btn btn-primary btn-lg">Baixar arquivo(s)</button>
+        <button type="submit" class="btn btn-primary btn-lg">Download!</button>
     </form>
+</fieldset>
 </div>
 {% endblock %}
