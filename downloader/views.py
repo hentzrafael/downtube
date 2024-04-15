@@ -1,8 +1,11 @@
+from random import Random
 from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import render
 from .forms import UrlForm,DetailsForm
 from pytube import Playlist, YouTube
+import os
+from moviepy.editor import *
 
 def index(request):
     form = UrlForm()
@@ -17,8 +20,10 @@ def details(request):
         
         if 'playlist' not in url:
             thumb = YouTube(url).thumbnail_url
+            youtube_title = YouTube(url).title
         elif 'playlist' in url:
             thumb = Playlist(url).videos[0].thumbnail_url
+            youtube_title = Playlist(url).title
     
     if request.method == 'POST':
         form = DetailsForm(request.POST)
@@ -26,14 +31,14 @@ def details(request):
             only_audio = form.cleaned_data['audio_or_video']
             url = request.session["url"]
             if 'playlist' in url:
-                download_playlist(url, "./tmp",only_audio)
+                download_playlist(url, "./downloads",only_audio)
             else:
-                download_video(url, "./tmp",only_audio)
+                download_video(url, "./downloads",only_audio)
             
             return render(request,'downloader/success.html')
     else:
         form = DetailsForm()
-    return render(request,'downloader/download.html', {'form': form, 'thumb': thumb})
+    return render(request,'downloader/download.html', {'form': form, 'thumb': thumb, 'youtube_title': youtube_title})
 
 
 def on_progress(stream, chunk, bytes_remaining):
@@ -44,18 +49,31 @@ def on_progress(stream, chunk, bytes_remaining):
 
 def download_playlist(url, path,only_audio=False):
     yt = Playlist(url)
-    for item in yt.video_urls:
+    for index,item in enumerate(yt.video_urls):
         yout = YouTube(item)
         yout.register_on_progress_callback(on_progress)
         if only_audio == "True":
-            yout.streams.get_audio_only().download(path,filename=f"{yout.title}.mp3")
+            out_file = yout.streams.filter(progressive=True,mime_type='video/mp4').first().download(path)
+            videoclip = VideoFileClip(out_file)
+            audioclip = videoclip.audio
+            audioclip.write_audiofile(out_file[0:-4] + '.mp3',ffmpeg_params=['-metadata', 'title='+yout.title,'-metadata', 'artist='+yout.author,'-metadata', 'album='+yout.author])
+            videoclip.close()
+            audioclip.close()
+            os.remove(out_file)
         else:
             yout.streams.filter(only_audio=False,only_video=False,progressive=True).get_highest_resolution().download(path)
+    
 
-def download_video(url, path,only_audio=False):
+def download_video(url, path:str,only_audio=False):
     yout = YouTube(url)
     yout.register_on_progress_callback(on_progress)
     if only_audio == "True":
-        yout.streams.get_audio_only().download(path,filename=f"{yout.title}.mp3")
+        out_file = yout.streams.filter(progressive=True,mime_type='video/mp4').first().download(path)
+        videoclip = VideoFileClip(out_file)
+        audioclip = videoclip.audio
+        audioclip.write_audiofile(out_file[0:-4] + '.mp3',ffmpeg_params=['-metadata', 'title='+yout.title,'-metadata', 'artist='+yout.author,'-metadata', 'album='+yout.author])
+        videoclip.close()
+        audioclip.close()
+        os.remove(out_file)
     else:
         yout.streams.filter(only_audio=False,only_video=False,progressive=True).get_highest_resolution().download(path)
