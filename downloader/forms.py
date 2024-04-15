@@ -8,5 +8,9 @@ class UrlForm(forms.Form):
         )
 
 class DetailsForm(forms.Form):
-    audio_or_video = forms.ChoiceField(widget=forms.RadioSelect(attrs={'class': 'form-check'}), choices=[(True, 'Audio'), (False, 'Video')],label="Escolha o tipo do arquivo:",required=True)
+    audio_or_video = forms.ChoiceField(
+        widget=forms.RadioSelect(attrs={'class': 'p-2'}), 
+        choices=[(True, 'mp3'), (False, 'mp4')],
+        label="Choose file type:",
+        required=True)
     

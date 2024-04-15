@@ -19,10 +19,10 @@ def details(request):
         request.session["url"] = url
         
         if 'playlist' not in url:
-            thumb = YouTube(url).thumbnail_url
-            youtube_title = YouTube(url).title
+            video = YouTube(url)
+            youtube_title = video.title
         elif 'playlist' in url:
-            thumb = Playlist(url).videos[0].thumbnail_url
+            video = Playlist(url).videos[0]
             youtube_title = Playlist(url).title
     
     if request.method == 'POST':
@@ -38,7 +38,7 @@ def details(request):
             return render(request,'downloader/success.html')
     else:
         form = DetailsForm()
-    return render(request,'downloader/download.html', {'form': form, 'thumb': thumb, 'youtube_title': youtube_title})
+    return render(request,'downloader/download.html', {'form': form, 'yt_video': video, 'youtube_title': youtube_title})
 
 
 def on_progress(stream, chunk, bytes_remaining):
@@ -49,7 +49,7 @@ def on_progress(stream, chunk, bytes_remaining):
 
 def download_playlist(url, path,only_audio=False):
     yt = Playlist(url)
-    for index,item in enumerate(yt.video_urls):
+    for item in yt.video_urls:
         yout = YouTube(item)
         yout.register_on_progress_callback(on_progress)
         if only_audio == "True":
