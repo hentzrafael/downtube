@@ -1,0 +1,29 @@
+{% extends 'downloader/base.html' %}
+{% load static %}
+{% block content %}
+<div class="col-md-12 col-lg-12">
+    <div class="row p-2">
+        <div class="col-md-4 col-lg-4">
+            <img src="{{ yt_video.thumbnail_url }}" alt="Youtube thumbnail" class="img-fluid">
+        </div>
+        <div class="col-md-8 col-lg-8">
+            <h2>{{ youtube_title }}</h2>
+            <p>Description: {{yt_video.description}}</p>
+            <p>Author: {{yt_video.author}}</p>
+            <p>Views: {{yt_video.views}}</p>
+            <p>Publish Date: {{yt_video.publish_date}}</p>
+        </div>
+    </div>
+    <fieldset class="form-fieldset">
+        <form action="/download" method="get">
+            <div class="input-group">
+                {% csrf_token %}
+                {{ form }}
+            </div>
+            <div class="p-2">
+                <button type="submit button" class="btn btn-primary btn-lg">Download files</button>
+            </div>
+        </form>
+    </fieldset>
+</div>
+{% endblock %}
