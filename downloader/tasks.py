@@ -1,23 +1,8 @@
 from celery import shared_task
-from time import sleep
 from celery_progress.backend import ProgressRecorder
 import os
 from pytube import Playlist, YouTube
 from moviepy.editor import *
-
-@shared_task(bind=True)
-def go_to_sleep(self, duration):
-    progress_recorder = ProgressRecorder(self)
-    for i in range(5):
-        sleep(duration)
-        progress_recorder.set_progress(i + 1, 5, f'On iteration {i}')
-    return 'Done'
-
-# def on_progress(self,stream, chunk, bytes_remaining):
-#     total_bytes = stream.filesize
-#     bytes_downloaded = total_bytes - bytes_remaining
-#     progress = (bytes_downloaded / total_bytes) * 100
-#     print(f"Download progress: {progress:.2f}%")
 
 @shared_task(bind=True)
 def download_playlist(self,url, path,only_audio=False):
@@ -25,7 +10,6 @@ def download_playlist(self,url, path,only_audio=False):
     progress_recorder = ProgressRecorder(self)
     for index,item in enumerate(yt.video_urls):
         yout = YouTube(item)
-        # yout.register_on_progress_callback(on_progress)
         if only_audio == "True":
             out_file = yout.streams.filter(progressive=True,mime_type='video/mp4').first().download(path)
             videoclip = VideoFileClip(out_file)
@@ -42,7 +26,6 @@ def download_playlist(self,url, path,only_audio=False):
 def download_video(self,url, path:str,only_audio=False):
     yout = YouTube(url)
     progress_recorder = ProgressRecorder(self)
-    # yout.register_on_progress_callback(self._on_progress)
     if only_audio == "True":
         progress_recorder.set_progress(0, 2, f'Downloading Video...')
         out_file = yout.streams.filter(progressive=True,mime_type='video/mp4').first().download(path)

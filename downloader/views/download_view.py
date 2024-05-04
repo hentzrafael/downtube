@@ -2,7 +2,6 @@ from django.views.generic import TemplateView
 from django.shortcuts import render
 from downloader.tasks import download_playlist, download_video
 
-
 class DownloadView(TemplateView):
     template_name = 'downloader/download.html'
 

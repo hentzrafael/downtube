@@ -17,7 +17,7 @@ class DetailsView(TemplateView):
         if 'playlist' not in url:
             video = YouTube(url)
             youtube_title = video.title
-        elif 'playlist' in url:
+        else:
             video = Playlist(url).videos[0]
             youtube_title = Playlist(url).title
 
